@@ -13,7 +13,7 @@ Jaysden obeys these on fetch, so a site that sets any of them is never indexed o
 
 A site that wants nothing to do with Jaysden can also mail the contact address and be added to a permanent do-not-crawl list keyed by destination, with no need to run anything.
 
-## After a crawl: removal requests
+## For removal requests after webscraping
 
 Anyone can request removal of an indexed site or an archived snapshot. Requests go to [contact], and the following are removed within [turnaround, e.g. 72 hours]:
 
