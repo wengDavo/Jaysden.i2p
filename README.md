@@ -25,7 +25,7 @@ Source tags make each method's yield measurable, so any method that finds nothin
 
 **Liveness.** A destination is up if its LeaseSet resolves. Every candidate is resolved before indexing; failures go to the retry schedule, not the index. This is the only "still up" test, and it is content-neutral, so every category is checked the same way.
 
-**Keeping sites findable.** Eepsites flicker, so Jaysden stores a compressed deduplicated snapshot of each page, with an age limit. Results work while a eepsite is down and survive after it dies, as a result, all media on that eespite is archived by default.
+**Keeping sites findable.** Eepsites flicker, so Jaysden stores a compressed deduplicated snapshot of each page, with an age limit. Results work while a eepsite is down and survive after it dies, yet even in spite of that, only all media on eepsites that pass the hard-rule filter, hash-matched first, is archived by default.
 
 **Filtering.** Hard rules run first: blacklists, hash matches, opt-outs, robots.txt, and no-index or no-archive markers. Matches are never stored or cached. A small text classifier scores the rest. A quantized model handles only the cases the cheap stages cannot settle, as a second layer and never the sole gate (see [REMOVAL.md]).
 
