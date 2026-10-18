@@ -6,7 +6,7 @@
 4. Link crawler with per-site rate limits
 5. Torrent DHT and tracker ingestion (confirm SAM 3.3 support on the chosen router first)
 6. Submission form and ping endpoint
-7. Text-only snapshot archive and the removal pipeline
+7. Text-to-audio-visual snapshot archive and the removal pipeline
 8. Hard-rule filter, then the classifier
 9. Staged model filtering for ambiguous cases
 10. Published coverage report
