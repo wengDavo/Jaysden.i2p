@@ -2,7 +2,7 @@
 
 1. Confirm which registries, trackers and the DHT are reachable, from a running router
 2. Seed union and still-up old address-book retries
-3. I2p mirrors/instances clearnet site address mining and Irc2P address mining
+3. I2P mirrors/instances clearnet site address mining and Irc2P address mining
 4. Link crawler with per-site rate limits
 5. Torrent DHT and tracker ingestion (confirm SAM 3.3 support on the chosen router first)
 6. Submission form and ping endpoint
