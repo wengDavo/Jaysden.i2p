@@ -25,11 +25,11 @@ Source tags make each method's yield measurable, so any method that finds nothin
 
 **Liveness.** A destination is up if its LeaseSet resolves. Every candidate is resolved before indexing; failures go to the retry schedule, not the index. This is the only "still up" test, and it is content-neutral, so every category is checked the same way.
 
-**Keeping sites findable.** Eepsites flicker, so Jaysden stores a compressed, deduplicated, text-only snapshot of each page, with an age limit. Results work while a site is down and survive after it dies. Media is not archived by default.
+**Keeping sites findable.** Eepsites flicker, so Jaysden stores a compressed deduplicated snapshot of each page, with an age limit. Results work while a eepsite is down and survive after it dies, as a result, all media on that eespite is archived by default.
 
 **Filtering.** Hard rules run first: blacklists, hash matches, opt-outs, robots.txt, and no-index or no-archive markers. Matches are never stored or cached. A small text classifier scores the rest. A quantized model handles only the cases the cheap stages cannot settle, as a second layer and never the sole gate (see [REMOVAL.md]).
 
-## Why demoscene
+## Why demoscene?
 
 Demoscene work gets the most from limited hardware, and I2P routers run on that kind of hardware. Jaysden applies the same discipline to the compute-bound parts, the classifier, index and archive: cheap filters before expensive ones, a text-first index, and an archive small enough to mirror. Webscraping speed is bound by tunnel builds, latency and uptime, not by code, and Jaysden claims no speedup there. The snapshot archive follows the scene's preservation tradition, whilst also giving us oppertunities for workaround for acheiving being able to snapshot what we find beyond text-based snapshots via applying the same sort of hardware restriction/limitation loopholing that developers in the demoscene apply to developing programs under the demoscene.
 
