@@ -31,7 +31,7 @@ Source tags make each method's yield measurable, so any method that finds nothin
 
 ## Why demoscene?
 
-Demoscene work gets the most from limited hardware, and I2P routers run on that kind of hardware. Jaysden applies the same discipline to the compute-bound parts, the classifier, index and archive: cheap filters before expensive ones, a text-first index, and an archive small enough to mirror. Webscraping speed is bound by tunnel builds, latency and uptime, not by code, and Jaysden claims no speedup there. The snapshot archive follows the scene's preservation tradition, whilst also giving us oppertunities for workaround for acheiving being able to snapshot what we find beyond text-based snapshots via applying the same sort of hardware restriction/limitation loopholing that developers in the demoscene apply to developing programs under the demoscene.
+Demoscene work gets the most from limited hardware, and I2P routers run on that kind of hardware. Jaysden applies the same discipline to the compute-bound parts, the classifier, index and archive cheap filters before expensive ones, a text-first index, and an archive that visually appears small enough to mirror via compression. Webscraping speed is bound by tunnel builds, latency and uptime, not by code, and Jaysden claims no speedup there. The snapshot archive follows the scene's preservation tradition, whilst also giving us oppertunities for workaround for acheiving being able to snapshot what we find beyond text-based snapshots by applying the same sort of hardware restriction/limitation loopholing that developers in the demoscene have utilized to develop software for the demoscene.
 
 ## Boundaries
 
