@@ -46,6 +46,6 @@ Demoscene work gets the most from limited hardware, and I2P routers run on that 
 
 Overlap between independent sources estimates how many sites remain undiscovered, so each crawl publishes that estimate with its results.
 
-## Contact
+## Where to reach us
 
 - https://discord.com/channels/1241171637978791987/1353883408786260029
