@@ -2,13 +2,13 @@
 
 A search engine for I2P, built on YaCy, named in memory of a mutual friend (of one of the contributers) that passed away.
 
-I2P's search engines are down. A network with no search looks empty to anyone arriving for the first time, which means fewer visitors, fewer eepsites, and a network that looks emptier still. Jaysden.i2p breaks that loop by crawling more of I2P than any index before it and keeping what it finds reachable.
+I2P's search engines are going down, whilst it should go without saying that any network with no search looks empty to anyone arriving for the first time, which means fewer visitors, fewer eepsites, and a network that looks emptier still. Jaysden.i2p breaks that loop by not only scraping and subsequently indexing more of I2P than any index before it, but also keeping what it finds reachable.
 
 Status: Concept stage i.e nothing runs yet.
 
 ## How it works
 
-Jaysden is a YaCy-based crawler and index with a back end that runs unattended. YaCy is open source, so the code is not the new part. The coverage, the freshness, and the work that sustains both are.
+Jaysden is a loosely YaCy-based crawler and index with a back-end that runs unattended. YaCy is open source, so the code is not the new part. The coverage, the freshness, and the work that sustains both are.
 
 **Finding sites.** Every address enters one seed set, tagged with the source that found it:
 
@@ -21,7 +21,7 @@ Jaysden is a YaCy-based crawler and index with a back end that runs unattended. 
 - A submission form and ping endpoint for site owners
 - Floodfill LeaseSet observation, one source among the rest, within the limits below
 
-Source tags make each method's yield measurable. A method that finds nothing new gets switched off without touching the others.
+Source tags make each method's yield measurable, so any method that finds nothing new gets switched off without touching the others.
 
 **Liveness.** A destination is up if its LeaseSet resolves. Every candidate is resolved before indexing; failures go to the retry schedule, not the index. This is the only "still up" test, and it is content-neutral, so every category is checked the same way.
 
@@ -31,7 +31,7 @@ Source tags make each method's yield measurable. A method that finds nothing new
 
 ## Why demoscene
 
-Demoscene work gets the most from limited hardware, and I2P routers run on that kind of hardware. Jaysden applies the same discipline to the compute-bound parts, the classifier, index and archive: cheap filters before expensive ones, a text-first index, and an archive small enough to mirror. Crawl speed is bound by tunnel builds, latency and uptime, not by code, and Jaysden claims no speedup there. The snapshot archive follows the scene's preservation tradition.
+Demoscene work gets the most from limited hardware, and I2P routers run on that kind of hardware. Jaysden applies the same discipline to the compute-bound parts, the classifier, index and archive: cheap filters before expensive ones, a text-first index, and an archive small enough to mirror. Webscraping speed is bound by tunnel builds, latency and uptime, not by code, and Jaysden claims no speedup there. The snapshot archive follows the scene's preservation tradition, whilst also giving us oppertunities for workaround for acheiving being able to snapshot what we find beyond text-based snapshots via applying the same sort of hardware restriction/limitation loopholing that developers in the demoscene apply to developing programs under the demoscene.
 
 ## Boundaries
 
