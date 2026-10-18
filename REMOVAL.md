@@ -15,7 +15,7 @@ A site that wants nothing to do with Jaysden can also mail the contact address a
 
 ## For removal requests after webscraping
 
-Anyone can request removal of an indexed site or an archived snapshot. Requests go to [contact], and the following are removed within [turnaround, e.g. 72 hours]:
+Anyone can request removal of an indexed site or an archived snapshot. Requests go to the operator, and the following are removed within 72 hours:
 
 - The index entry, so the site stops appearing in results
 - Every stored snapshot of the affected pages
@@ -23,13 +23,13 @@ Anyone can request removal of an indexed site or an archived snapshot. Requests 
 
 **Verifying operators.** To remove a whole destination rather than a single page, the requester proves control of it: a signed message from the destination's key, a tag file served at a named path on the site, or a reply from the site's published contact. This stops one person from erasing another's site. Single-page takedowns on clear grounds (see below) need no proof.
 
-**Third-party requests.** Someone who is not the operator can still request removal of a specific page on these grounds, and does not need to prove control:
+**Third-party requests:** Someone who is not the operator can still request removal of a specific page on these grounds, and does not need to prove control:
 
 - Illegal content under the operating jurisdiction
 - Personal information published without consent (doxxing)
 - Content that matches the blacklist or hash sets
 
-## Independent of any request, Jaysden doesn't store:
+## Independent of any request, Jaysden doesn't store
 
 - Anything matching the explicitly illegal-content filter on fetch
 - Media files, by default
