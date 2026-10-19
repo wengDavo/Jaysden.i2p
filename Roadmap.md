@@ -1,6 +1,6 @@
 ## Roadmap
 
-1. 1. Stand up YaCy in private-peer isolation, routed through the I2P HTTP proxy, serving jaysden.i2p (see `yacy-setup.md`)
+1. Stand up YaCy in private-peer isolation, routed through the I2P HTTP proxy, serving jaysden.i2p (see `yacy-setup.md`)
 2. Confirm which registries, trackers and the DHT are reachable, from a running router
 3. Seed union and old address-book retries
 4. Clearnet and Irc2P address mining
