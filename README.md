@@ -4,7 +4,7 @@ A search engine for I2P, built on YaCy, named in memory of a mutual friend (of o
 
 I2P's search engines are going down, whilst it should go without saying that any network with no search looks empty to anyone arriving for the first time, which means fewer visitors, fewer eepsites, and a network that looks emptier still. Jaysden.i2p breaks that loop by not only scraping and subsequently indexing more of I2P than any index before it, but also keeping what it finds reachable.
 
-**Status:** Concept stage i.e nothing runs yet.
+[**Status:** Concept stage i.e nothing runs yet.]
 
 ## How it works
 
@@ -22,8 +22,8 @@ Jaysden is a loosely YaCy-based crawler and index with a back-end that runs unat
 - Irc2P channel pastes
 - A submission form and ping endpoint for site owners
 - Floodfill LeaseSet observation, one source among the rest, within the limits below
-
-Source tags make each method's yield measurable, so any method that finds nothing new gets switched off without touching the others.
+- Source tags make each method's yield measurable
+- Any method that finds nothing new gets switched off without touching the others.]
 
 **Liveness:** A destination is up if its LeaseSet resolves, as every candidate is resolved before indexing. This means that failures go to the retry schedule, rather than to the index. This is the only "still up" test, and it is content-neutral, so every category is checked the same way.
 
@@ -47,8 +47,8 @@ Demoscene work gets the most from limited hardware, and I2P routers run on that 
 - Encrypted and blinded LeaseSets are never targeted, just Floodfill-sourced addresses are checked against robots.txt and no-index markers before any fetch.
 - The index is built to be shared between YaCy peers and mirrored, so Jaysden is not the single point of failure it replaces.
 - The illegal-content policy is written before the first crawl, not after.
-- A clearnet or onion identity is linked to an .i2p address only when the site advertises it. Jaysden never infers and publishes an undisclosed cross-network identity, because that is a deanonymization vector.
+- A clearnet or onion identity is linked to an .i2p address only when the site advertises it, so Jaysden never infers and publishes an undisclosed cross-network identity, due to that being a deanonymization vector.
 
 ## Coverage reporting
 
-The headline coverage number counts native sites only. Multi-homed and unknown show as their own subcounts and are not folded into it, so a misclassification undercounts native rather than inflating it. Mirrors, instances and proxies are reported separately and never counted toward the headline. Overlap between independent sources estimates how many sites remain undiscovered, per origin type. This is what keeps "more than any index so far" honest, since a total padded with mirrors and software instances is the exact inflation that made earlier indexes look bigger than the network was.
+Keep in mind, that the headline coverage number only counts sites native to I2P. Hence, Multi-homed and unknown show as their own subcounts rather than being directly folded into it, so a misclassification undercounts native rather than inflating it. Mirrors, instances and proxies are reported separately and never counted toward the headline. Overlap between independent sources estimates how many sites remain undiscovered, per origin type. This is what keeps "more than any index so far" honest, since a total padded with mirrors and software instances is the exact inflation that made earlier indexes look bigger than the network was.
