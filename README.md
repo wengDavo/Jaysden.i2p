@@ -27,7 +27,7 @@ Jaysden is a loosely YaCy-based crawler and index with a back-end that runs unat
 
 ## The '4 Horsemen' of Jaysden's auto-filtering approach
 
-**Hard rules run first:** This includes blacklists, hash matches, opt-outs, robots.txt, and no-index or no-archive markers. Matches are never stored or cached, so a small text classifier scores the rest. A quantized model handles only the cases the cheap stages cannot settle, as a second layer and never the sole gate (see [REMOVAL.md]).
+**Hard rules run first:** This includes blacklists, hash matches, opt-outs, robots.txt, and no-index or no-archive markers. Matches are never stored or cached, so a small text classifier scores the rest. A quantized model handles only the cases the cheap stages cannot settle, as a second layer and never the sole gate (see [REMOVAL.md](<REMOVAL.md>)).
 
 **Liveness:** A destination is up if its LeaseSet resolves, as every candidate is resolved before indexing. This means that failures go to the retry schedule, rather than to the index. This is the only "still up" test, and it is content-neutral, so every category is checked the same way.
 
