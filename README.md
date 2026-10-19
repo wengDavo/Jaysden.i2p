@@ -25,13 +25,13 @@ Jaysden is a loosely YaCy-based crawler and index with a back-end that runs unat
 - Source tags make each method's yield measurable
 - Any method that finds nothing new gets switched off without touching the others.]
 
+## The '4 Horsemen' of our filtering approach
+
+**Hard rules run first:** This includes blacklists, hash matches, opt-outs, robots.txt, and no-index or no-archive markers. Matches are never stored or cached, so a small text classifier scores the rest. A quantized model handles only the cases the cheap stages cannot settle, as a second layer and never the sole gate (see [REMOVAL.md]).
+
 **Liveness:** A destination is up if its LeaseSet resolves, as every candidate is resolved before indexing. This means that failures go to the retry schedule, rather than to the index. This is the only "still up" test, and it is content-neutral, so every category is checked the same way.
 
 **Keeping sites findable:** Eepsites flicker, so Jaysden stores a compressed deduplicated snapshot of each page, with an age limit. Results work while a eepsite is down and survive after it dies, yet even in spite of that, only all media on eepsites that pass the hard-rule filter, hash-matched first, is archived by default.
-
-## Filtering
-
-**Hard rules run first:** This includes blacklists, hash matches, opt-outs, robots.txt, and no-index or no-archive markers. Matches are never stored or cached, so a small text classifier scores the rest. A quantized model handles only the cases the cheap stages cannot settle, as a second layer and never the sole gate (see [REMOVAL.md]).
 
 **Origin tagging:** Each indexed site is classified by origin, native versus derivative (mirror, instance, proxy/gateway), with multi-homed and unknown as their own cases. Detection runs on signals already gathered during the crawl, cheapest first. A cross-network link to a clearnet or onion address is recorded only when the site advertises it; A site that appears multi-homed without saying so is tagged unknown, never outed. Full detection, schema and the stats-page layout are in [the stats page format](<eepsite stat webpage format.md>).
 
