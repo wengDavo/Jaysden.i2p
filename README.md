@@ -4,13 +4,15 @@ A search engine for I2P, built on YaCy, named in memory of a mutual friend (of o
 
 I2P's search engines are going down, whilst it should go without saying that any network with no search looks empty to anyone arriving for the first time, which means fewer visitors, fewer eepsites, and a network that looks emptier still. Jaysden.i2p breaks that loop by not only scraping and subsequently indexing more of I2P than any index before it, but also keeping what it finds reachable.
 
-Status: Concept stage i.e nothing runs yet.
+**Status:** Concept stage i.e nothing runs yet.
 
 ## How it works
 
 Jaysden is a loosely YaCy-based crawler and index with a back-end that runs unattended. YaCy is open source, so the code is not the new part. The coverage, the freshness, and the work that sustains both are.
 
-**Finding sites.** Every address enters one seed set, tagged with the source that found it:
+## Finding sites
+
+**Every address enters one seed set, tagged with the source that found it:**
 
 - Registries and directories, merged and diffed (reg.i2p, identiguy.i2p, notbob.i2p and the rest)
 - Old address books from past releases, retried on a schedule
@@ -23,11 +25,15 @@ Jaysden is a loosely YaCy-based crawler and index with a back-end that runs unat
 
 Source tags make each method's yield measurable, so any method that finds nothing new gets switched off without touching the others.
 
-**Liveness.** A destination is up if its LeaseSet resolves. Every candidate is resolved before indexing; failures go to the retry schedule, not the index. This is the only "still up" test, and it is content-neutral, so every category is checked the same way.
+**Liveness:** A destination is up if its LeaseSet resolves, as every candidate is resolved before indexing. This means that failures go to the retry schedule, rather than to the index. This is the only "still up" test, and it is content-neutral, so every category is checked the same way.
 
-**Keeping sites findable.** Eepsites flicker, so Jaysden stores a compressed deduplicated snapshot of each page, with an age limit. Results work while a eepsite is down and survive after it dies, yet even in spite of that, only all media on eepsites that pass the hard-rule filter, hash-matched first, is archived by default.
+**Keeping sites findable:** Eepsites flicker, so Jaysden stores a compressed deduplicated snapshot of each page, with an age limit. Results work while a eepsite is down and survive after it dies, yet even in spite of that, only all media on eepsites that pass the hard-rule filter, hash-matched first, is archived by default.
 
-**Filtering.** Hard rules run first: blacklists, hash matches, opt-outs, robots.txt, and no-index or no-archive markers. Matches are never stored or cached. A small text classifier scores the rest. A quantized model handles only the cases the cheap stages cannot settle, as a second layer and never the sole gate (see [REMOVAL.md]).
+## Filtering
+
+**Hard rules run first:** This includes blacklists, hash matches, opt-outs, robots.txt, and no-index or no-archive markers. Matches are never stored or cached, so a small text classifier scores the rest. A quantized model handles only the cases the cheap stages cannot settle, as a second layer and never the sole gate (see [REMOVAL.md]).
+
+**Origin tagging:** Each indexed site is classified by origin, native versus derivative (mirror, instance, proxy/gateway), with multi-homed and unknown as their own cases. Detection runs on signals already gathered during the crawl, cheapest first. A cross-network link to a clearnet or onion address is recorded only when the site advertises it; A site that appears multi-homed without saying so is tagged unknown, never outed. Full detection, schema and the stats-page layout are in [the stats page format](<eepsite stat webpage format.md>).
 
 ## Why demoscene?
 
@@ -41,11 +47,8 @@ Demoscene work gets the most from limited hardware, and I2P routers run on that 
 - Encrypted and blinded LeaseSets are never targeted, just Floodfill-sourced addresses are checked against robots.txt and no-index markers before any fetch.
 - The index is built to be shared between YaCy peers and mirrored, so Jaysden is not the single point of failure it replaces.
 - The illegal-content policy is written before the first crawl, not after.
+- A clearnet or onion identity is linked to an .i2p address only when the site advertises it. Jaysden never infers and publishes an undisclosed cross-network identity, because that is a deanonymization vector.
 
-## Measuring coverage
+## Coverage reporting
 
-Overlap between independent sources estimates how many sites remain undiscovered, so each crawl publishes that estimate with its results.
-
-## Where to reach us
-
-- https://discord.com/channels/1241171637978791987/1353883408786260029
+The headline coverage number counts native sites only. Multi-homed and unknown show as their own subcounts and are not folded into it, so a misclassification undercounts native rather than inflating it. Mirrors, instances and proxies are reported separately and never counted toward the headline. Overlap between independent sources estimates how many sites remain undiscovered, per origin type. This is what keeps "more than any index so far" honest, since a total padded with mirrors and software instances is the exact inflation that made earlier indexes look bigger than the network was.
