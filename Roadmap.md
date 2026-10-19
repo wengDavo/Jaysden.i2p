@@ -13,4 +13,4 @@
 11. Origin classification, native versus derivative tagging
 12. Published coverage report
 13. Statistics page, the 50/50 native versus derivatives split (see `eepsite stat webpage format.md`)
-14. A maintained hosts.txt feed to subscribe to
+14. A maintained hosts.txt feed to subscribe to that automatically self-updates in real-time
