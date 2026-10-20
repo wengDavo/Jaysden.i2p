@@ -1,6 +1,6 @@
 # YaCy setup for Jaysden
 
-This configures a single YaCy peer to crawl and serve only I2P. Keys are for the current YaCy release and replace the outdated ones in last year's guide (`network.unit.name`, `network.unit.dht` and `publicPort` are not real keys). Stop YaCy before editing `DATA/SETTINGS/yacy.conf`, then restart. Most of this is also settable under Administration in the web UI.
+This configures a single YaCy peer that's only supposed to crawl and serve I2P, which is why you should stop YaCy before editing `DATA/SETTINGS/yacy.conf`, then restart. Most of this is also settable under Administration in the web UI, but the finalized version of Jaysden.i2p shouldn't have any option to access "Administration in the web UI", but administration shouldn't be viewable in settings and only accessible in the back-end, so remove all webpages for settings before publishing Jaysden.i2p on I2P.
 
 ## 1. Network isolation (Robinson)
 
@@ -13,7 +13,7 @@ allowReceiveIndex=false
 allowDistributeIndexWhileCrawling=false
 ```
 
-`cluster.mode=privatepeer` is the UI's "Private Peer" under Administration > Use Case & Accounts (ConfigNetwork). YaCy has no single "DHT off" switch, so the isolation is `privatepeer` plus both index-distribution flags off. Confirm in the Network config page that the peer shows as isolated after restart.
+`cluster.mode=privatepeer` is the UI's "Private Peer" under Administration > Use Case & Accounts (ConfigNetwork). YaCy has no single "DHT off" switch, so the isolation is `privatepeer` plus both index-distribution flags off. Confirm in the Network config page that the peer shows as isolated after restart, then remove the Network config page before publishing Jaysden.i2p on I2P.
 
 For isolation at the network-definition level as well, point `network.unit.definition` at a custom or the intranet unit file instead of `defaults/yacy.network.freeworld.unit`. With `privatepeer` already set this is belt-and-suspenders, so only do it if you want the peer fully detached from the freeworld definition.
 
@@ -29,7 +29,7 @@ remoteProxyPort=4444
 remoteProxyNoProxy=127.*,10.*,192.168.*,localhost
 ```
 
-4444 is I2P's default HTTP proxy port. Keep localhost and private ranges in `remoteProxyNoProxy` so YaCy's own API calls are not sent through I2P.
+4444 is I2P's default HTTP proxy port, keep localhost and private ranges in `remoteProxyNoProxy` so YaCy's own API calls are not sent through I2P.
 
 ## 3. Serve Jaysden.i2p
 
@@ -49,11 +49,15 @@ port=<same local port as the tunnel target>
 staticIP=<your jaysden b32 address>
 ```
 
-Do not set `publicPort`, it is not a key. `port` is the externally visible port; `bindPort` only matters if you bind internally to a different port behind forwarding, which you do not need here.
+Do not set `publicPort`, it is not a key. `port` is the externally visible port. `bindPort` only matters if you bind internally to a different port behind forwarding, which you do not need here.
 
 ## 4. Robots.txt stays on
 
 The old guide set `obeyRobotsTxt=false`. Do not. There is no such global key in current YaCy, and the crawler obeys robots.txt by default, which is what the project's Boundaries require. Leave per-crawl `crawlingObeyHtmlRobotsNoindex` and `crawlingObeyHtmlRobotsNofollow` at their defaults too. Politeness and blacklists are enforced per crawl, not by disabling them globally.
+
+## 5. Keep the heap modest
+
+Last year's guide set a 16GB Java heap, which does not fit the hardware Jaysden targets. Size the JVM heap to the device and raise it only when the index actually needs it. YaCy wants more heap as the index grows, so this is a dial to watch rather than set-and-forget, but a Pi or a home router is nowhere near 16GB and should never be configured as if it were.
 
 ## Verify before relying on this
 
