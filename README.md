@@ -23,7 +23,7 @@ Jaysden is a loosely YaCy-based crawler and index with a back-end that runs unat
 - A submission form and ping endpoint for site owners
 - Floodfill LeaseSet observation, one source among the rest, within the limits below
 - Source tags make each method's yield measurable
-- Any method that finds nothing new gets switched off without touching the others.]
+- Any method that finds nothing new gets switched off without touching the others.
 
 ## The '4 Horsemen' of Jaysden's auto-filtering approach
 
@@ -31,13 +31,21 @@ Jaysden is a loosely YaCy-based crawler and index with a back-end that runs unat
 
 **Liveness:** A destination is up if its LeaseSet resolves, as every candidate is resolved before indexing. This means that failures go to the retry schedule, rather than to the index. This is the only "still up" test, and it is content-neutral, so every category is checked the same way.
 
-**Keeping sites findable:** Eepsites flicker, so Jaysden stores a compressed deduplicated snapshot of each page, with an age limit. Results work while a eepsite is down and survive after it dies, yet even in spite of that, only all media on a given that passes the aformentioned hard-rule filter, and is hash-matched first, shall be archived by default.
+**Keeping sites findable:** Eepsites flicker, so Jaysden stores a compressed, deduplicated snapshot of each page, with an age limit. Results work while an eepsite is down and survive after it dies. Snapshots are text-first. Media is archived only once a known-illegal-content hash gate is live, and then only media that clears the hard-rule filter and is checked against the hash sets first, so anything that matches is never fetched into the archive. Until that hash source is in place, the archive stays text-only.
 
 **Origin tagging:** Each indexed site is classified by origin, native versus derivative (mirror, instance, proxy/gateway), with multi-homed and unknown as their own cases. Detection runs on signals already gathered during the crawl, cheapest first. A cross-network link to a clearnet or onion address is recorded only when the site advertises it; A site that appears multi-homed without saying so is tagged unknown, never outed. Full detection, schema and the stats-page layout are in [the stats page format](<eepsite stat webpage format.md>).
 
 ## Why demoscene?
 
-Demoscene work gets the most from limited hardware, and I2P routers run on that kind of hardware. Jaysden applies the same discipline to the compute-bound parts, the classifier, index and archive cheap filters before expensive ones, a text-first index, and an archive that visually appears small enough to mirror via compression. Webscraping speed is bound by tunnel builds, latency and uptime, not by code, and Jaysden claims no speedup there. The snapshot archive follows the scene's preservation tradition, whilst also giving us oppertunities for workaround for acheiving being able to snapshot what we find beyond text-based snapshots by applying the same sort of hardware restriction/limitation loopholing that developers in the demoscene have utilized to develop software for the demoscene.
+Demoscene work gets the most from limited hardware, and I2P routers run on that kind of hardware. Jaysden applies the same discipline to the compute-bound parts, the classifier, index and archive: cheap filters before expensive ones, a text-first index, and an archive compressed small enough to mirror. Webscraping speed is bound by tunnel builds, latency and uptime, not by code, and Jaysden claims no speedup there. The snapshot archive follows the scene's preservation tradition. That same size-coding discipline is what later makes media archiving feasible on this hardware, once the hash gate above is live, since fitting media snapshots into a mirrorable footprint is a compression problem of exactly the kind the demoscene exists to solve.
+
+## Under the hood
+
+- **Deduplication:** a cascade of bloom filters whose precision degrades with crawl depth, each backed by a bitarray so memory stays bounded. Shallow depths get high precision, deep crawls get coarse filters, and past the deepest tier the crawler falls back to probabilistic sampling. Dedup memory stays flat on a small box instead of growing with the frontier.
+
+- **Storage:** snapshots and index payloads compress with LZ4 in fast mode, which keeps the text-first archive small enough to mirror. b32 addresses are a fixed 52-character charset, so they bit-pack to roughly 32 bytes, worth doing for the URL store given how many the index holds. Media follows the hash-gate rule in Keeping sites findable and [REMOVAL.md](<REMOVAL.md>)).
+
+- **Recrawl scheduling:** the tier idea from the old scheduler (critical, active, normal, archive, roughly hourly to roughly weekly), but a site's tier comes from its observed uptime history, not from bits of its address hash. The liveness test already produces that history, so a site that resolves on most checks earns a faster tier and one that stops resolving long enough leaves the index. Scheduling by address hash set frequency at random and is not carried over.
 
 ## Boundaries
 
