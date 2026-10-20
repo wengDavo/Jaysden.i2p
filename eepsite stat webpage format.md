@@ -14,7 +14,7 @@ A symmetrical 50/50 split, two equal columns, mirror image of each other:
 
 Each column shows its group total at the top and a count per subcategory below. The left/right assignment is cosmetic, since the halves are mirrored, but native leads because it is the number the whole project exists to grow.
 
-Subcategory meanings:
+## Subcategory meanings
 
 - **Native:** built for and living on I2P, with no clearnet, Tor, or other origin.
 - **Multi-homed:** run on I2P by its operator, who also runs it elsewhere and says so.
