@@ -6,8 +6,8 @@ The stats page reports what the crawler has found, grouped so that genuinely-I2P
 
 A symmetrical 50/50 split, two equal columns, mirror image of each other:
 
-- **Left: Native.** Subcategories: native, multi-homed, unknown.
-- **Right: Derivatives.** Subcategories: mirror, instance, proxy/gateway.
+- **Left = Native.** - Subcategories: native, multi-homed, unknown.
+- **Right = Derivatives.** - Subcategories: mirror, instance, proxy/gateway.
 
 Each column shows its group total at the top and a count per subcategory below. The left/right assignment is cosmetic, since the halves are mirrored, but native leads because it is the number the whole project exists to grow.
 
