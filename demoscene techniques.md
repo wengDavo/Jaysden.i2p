@@ -1,10 +1,10 @@
 # Demoscene techniques for Jaysden
 
-The demoscene gets large results out of small hardware by generating instead of storing, approximating instead of counting exactly, and packing data to the bit. Those are the same constraints Jaysden runs under: a crawler and index that have to sit on a Raspberry Pi or a home router and still estimate coverage, deduplicate, and keep a mirrorable archive. This file lists the techniques worth retrofitting, each with working code and the Jaysden feature it serves.
+The demoscene gets large results out of small hardware by generating instead of storing, approximating instead of counting exactly, and packing data to the bit. Those are the same constraints Jaysden runs under, and more so now that the back-end is a distributed scrape rather than a single crawler. Many peers, each on hardware as small as a Raspberry Pi or a home router, pull from the sources in the README (the registry union, old address books, clearnet and Irc2P mining, the link crawl, the torrent DHT, submissions, floodfill observation), scrape the eepsites they discover, and share the results. Spreading the work across peers raises two problems a single crawler never had: deciding which peer scrapes which site without a coordinator, and merging each peer's coverage, dedup, and index into one view without shipping everything. The scene's minimal-state, approximate, bit-packed habits answer both. This file lists the techniques worth retrofitting, each with working code and the Jaysden feature it serves.
 
 These run as Python modules alongside the YaCy fork, not inside it. A few (b32 packing, varint) could also live in YaCy's Java index core.
 
-Hashing: the code uses `mmh3` (fast, non-cryptographic, the right choice here). If it is not installed, `hashlib.blake2b(data, digest_size=8)` is a drop-in 64-bit hash. The sketches, bit-packing, varint and SimHash below were tested; the image, compression and mmap helpers are standard library usage, so confirm them in your build.
+Hashing: the code uses `mmh3` (fast, non-cryptographic, the right choice here). If it is not installed, `hashlib.blake2b(data, digest_size=8)` is a drop-in 64-bit hash. The sketches, bit-packing, varint, SimHash, rendezvous hashing and IBLT below were tested; the image, compression and mmap helpers are standard library usage, so confirm them in your build.
 
 A hard line before the media sections: perceptual hashes here (dHash, SimHash) are for dedup and mirror detection only. They are not the illegal-content gate. Nothing media is fetched or stored until the known-illegal hash check in REMOVAL.md clears it first. That ordering is not optional.
 
@@ -42,7 +42,7 @@ class BloomFilter:
 
 ### HyperLogLog — coverage cardinality and source overlap
 
-The strongest fit for the coverage report. Counts unique sites in ~16KB at under 1% error, and because the union of two HLLs is the register-wise max, you get overlap between two discovery sources without storing either set. That is exactly the "overlap estimates how many sites remain undiscovered" line in the README.
+The strongest fit for the coverage report, and it earns its place twice over in a distributed scrape. It counts unique sites in ~16KB at under 1% error, and because the union of two HLLs is the register-wise max, that merge is both how you estimate overlap between discovery sources and how you aggregate coverage across peers. Each peer keeps its own HLL, and merging them gives the network-wide unique count without any peer holding every address. That is the "overlap estimates how many sites remain undiscovered" line in the README, now computed across the whole fleet.
 
 ```python
 import mmh3
@@ -78,7 +78,7 @@ class HyperLogLog:
 
 ### MinHash — near-duplicate and set similarity
 
-Jaccard similarity between two sets in fixed space. Use it two ways: signatures per discovery source to estimate how much two sources overlap, and shingle-set signatures per page to catch near-duplicates. Accuracy scales with `num_perm`; 128 is noisy, 256 to 512 tightens it.
+Jaccard similarity between two sets in fixed space. Use it three ways now: signatures per discovery source to estimate source overlap, shingle-set signatures per page to catch near-duplicates, and signatures per peer's address set to see how much two peers' scrapes overlap, which tells you whether the work-partitioning is spreading the load or two peers are scraping the same sites. Accuracy scales with `num_perm`; 128 is noisy, 256 to 512 tightens it.
 
 ```python
 import mmh3
@@ -248,7 +248,7 @@ def decode_postings(data):
 
 ### Roaring bitmaps — compressed sets
 
-For large "seen document" sets and fast union/intersection, which also gives exact overlap when you want it instead of the HLL estimate. Do not hand-roll it, use `pyroaring`.
+For large "seen document" sets and fast union/intersection, which also gives exact overlap when you want it instead of the HLL estimate. In the distributed scrape it is the compact form a peer ships when another peer needs its exact seen-set, and the intersection gives the redundant overlap directly. Do not hand-roll it, use `pyroaring`.
 
 ```python
 from pyroaring import BitMap
@@ -331,21 +331,110 @@ def media_proxy(path, max_dim=160, quality=40):
 
 ---
 
+## 6. Distributed scrape coordination
+
+The back-end is many peers now, not one crawler. These are the scene's minimal-state and compact-sync habits applied to spreading the scrape and merging it back.
+
+### Rendezvous (HRW) hashing — assign sites to peers with no table
+
+Each peer decides which sites it owns by scoring every (peer, site) pair and taking the highest. No coordinator, no stored assignment table, and when a peer joins or leaves only the sites it owned move. This is "generate, don't store" applied to work partitioning: ownership is a function you compute, not a map you keep. Tested: even spread across peers, and removing a peer reassigns only its own sites.
+
+```python
+import mmh3
+
+def owner(site, peers):
+    return max(peers, key=lambda p: mmh3.hash64((p + ":" + site).encode(), signed=False)[0])
+
+def owners(site, peers, r):          # r-way assignment for redundancy
+    return sorted(peers, key=lambda p: mmh3.hash64((p + ":" + site).encode(), signed=False)[0],
+                  reverse=True)[:r]
+```
+
+A peer scrapes `site` when it is in `owners(site, peers, r)`, so r peers cover each site and a lost peer's sites are already assigned to the next in line. Feed `peers` from the same address sources as everything else.
+
+### IBLT — reconcile two peers' sets in space proportional to the difference
+
+When two peers compare which addresses or which indexed documents they hold, shipping the whole set is wasteful once the sets are mostly equal. An Invertible Bloom Lookup Table encodes a set into a fixed number of cells; subtract one peer's table from another's and decode to get exactly the symmetric difference, in space that scales with the difference, not the sets. Tested: it recovers the difference in 80 cells even with a thousand shared keys. Keys are 64-bit ids (the first 8 bytes of a hash of the address); map ids back to addresses locally or request the few that differ.
+
+```python
+import mmh3
+
+class IBLT:
+    def __init__(self, cells=80, k=4):
+        self.m = cells; self.k = k
+        self.count = [0] * cells; self.keysum = [0] * cells; self.hashsum = [0] * cells
+
+    def _pos(self, key):
+        kb = key.to_bytes(8, "big")
+        return set(mmh3.hash(kb, i) % self.m for i in range(self.k))
+
+    def _hk(self, key):
+        return mmh3.hash(key.to_bytes(8, "big"), 99) & 0xFFFFFFFF
+
+    def _op(self, key, sign):
+        hk = self._hk(key)
+        for p in self._pos(key):
+            self.count[p] += sign; self.keysum[p] ^= key; self.hashsum[p] ^= hk
+
+    def insert(self, key):
+        self._op(key, 1)
+
+    def subtract(self, other):
+        for i in range(self.m):
+            self.count[i] -= other.count[i]
+            self.keysum[i] ^= other.keysum[i]
+            self.hashsum[i] ^= other.hashsum[i]
+
+    def decode(self):
+        a_only, b_only = set(), set(); changed = True
+        while changed:
+            changed = False
+            for i in range(self.m):
+                if self.count[i] in (1, -1) and self.hashsum[i] == self._hk(self.keysum[i]):
+                    key = self.keysum[i]
+                    (a_only if self.count[i] == 1 else b_only).add(key)
+                    self._op(key, -self.count[i]); changed = True
+        return a_only, b_only       # a_only: in A not B; b_only: in B not A
+```
+
+Size cells to roughly 1.5x the expected difference. If a decode stalls with cells left un-peeled, the difference outgrew the table, so retry larger.
+
+### Gossip — spread new addresses without a broadcast
+
+A peer that finds a new address does not tell everyone. It tells a few random peers, who tell a few more, and the address reaches the fleet in about log(N) rounds with bounded per-peer traffic. Pair it with the two above: gossip carries the IBLT or HLL summaries, and a peer pulls only the differing entries. The merge is a set union, so order and duplication do not matter.
+
+```python
+import random
+
+def gossip_round(known: set, peer_samples, fanout=3):
+    # peer_samples: list of callables, each returning a peer's address set
+    for fetch in random.sample(peer_samples, min(fanout, len(peer_samples))):
+        known |= fetch()
+    return known
+```
+
+Cross-peer coverage and overlap ride on techniques already above: each peer keeps an HLL and the register-wise merge gives network-wide coverage, and per-peer MinHash signatures show whether two peers are scraping the same sites.
+
+---
+
 ## Mapping to the design
 
 | Technique | Jaysden use | Status |
 |---|---|---|
 | Bloom filter | Crawl-frontier dedup | In design (cascade) |
-| HyperLogLog | Coverage cardinality and source overlap | New, strong fit |
-| MinHash | Source overlap, page near-dup | New |
+| HyperLogLog | Coverage cardinality, source and cross-peer overlap | New, strong fit |
+| MinHash | Source, page, and cross-peer overlap | New |
 | Count-Min Sketch | Address popularity, term frequency | New |
 | Reservoir sampling | Sampling past the depth cap | In design (as "probabilistic sampling") |
 | SimHash | Text mirror detection for origin tagging | In design (Stage 2) |
 | dHash | Image dedup and mirror detection | New |
 | Base32 packing | URL store size | In design (address packing) |
 | Varint + delta | Posting-list compression | New |
-| Roaring bitmaps | Compressed seen-sets, exact overlap | New |
+| Roaring bitmaps | Compressed seen-sets, exact cross-peer overlap | New |
 | zstd shared dictionary | Small-page archive compression | Extends LZ4 storage |
 | Memory-mapped index | Serving on low RAM | Replaces the ring buffer idea |
 | Fixed-point + jitter | No-FPU routers, load spreading | Corrects the old scheduler |
 | Media proxy + perceptual hash | Media snapshots on tiny storage | Supports the gated media phase |
+| Rendezvous (HRW) hashing | Assign sites to peers, no coordinator | New (distributed scrape) |
+| IBLT | Reconcile peer sets by the difference | New (distributed scrape) |
+| Gossip | Spread new addresses across peers | New (distributed scrape) |
