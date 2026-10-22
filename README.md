@@ -14,15 +14,15 @@ Jaysden is a loosely YaCy-based crawler and index with a back-end that runs unat
 
 **Every address enters one seed set, tagged with the source that found it:**
 
-- Registries and directories, merged and diffed (reg.i2p, identiguy.i2p, notbob.i2p and the rest)
-- Old address books from past releases, retried on a schedule
-- Clearnet-posted .i2p and .b32.i2p addresses from GitHub lists, forums, blogs and wikis
-- Outbound links from every crawled page
-- The i2psnark DHT and open trackers, for destinations running torrent clients
-- Irc2P channel pastes
-- A submission form and ping endpoint for site owners
-- Floodfill LeaseSet observation, one source among the rest, within the limits below
-- Source tags make each method's yield measurable
+- Registries and directories, merged and diffed (reg.i2p, identiguy.i2p, notbob.i2p and the rest).
+- Old address books from past releases, retried on a schedule.
+- Clearnet-posted .i2p and .b32.i2p addresses from GitHub lists, forums, blogs and wikis.
+- Outbound links from every scraped page.
+- The i2psnark DHT and open trackers, for destinations running torrent clients.
+- Irc2P channel pastes.
+- A submission form and ping endpoint for site owners.
+- Floodfill LeaseSet observation, one source among the rest, within the limits below.
+- Source tags make each method's yield measurable.
 - Any method that finds nothing new gets switched off without touching the others.
 
 ## The '4 Horsemen' of Jaysden's auto-filtering approach
