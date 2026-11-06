@@ -2,7 +2,7 @@
 
 A search engine for I2P, built on YaCy, named in memory of a mutual friend (of one of the contributers) that passed away.
 
-I2P's search engines are going down, whilst it should go without saying that any network with no search looks empty to anyone arriving for the first time, which means fewer visitors, fewer eepsites, and a network that looks emptier still. Jaysden.i2p breaks that loop by not only scraping and subsequently indexing more of I2P than any index before it, but also keeping what it finds reachable.
+I2P's search engines have been going down since seemingly forever, whilst it should go without saying that any network with no search looks empty to anyone arriving for the first time, which means fewer visitors, fewer eepsites, and a network that looks emptier still. Jaysden.i2p breaks that loop by not only scraping and subsequently indexing more of I2P than any index before it, but also keeping what it finds reachable.
 
 [**Status:** Concept stage i.e nothing runs yet.]
 
